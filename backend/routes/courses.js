@@ -1,5 +1,5 @@
 import express from 'express';
-import Course from '../models/Course.js';
+import Course from '../models/course.js';
 import auth from '../middleware/auth.js';
 
 const router = express.Router();
