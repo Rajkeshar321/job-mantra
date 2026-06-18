@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/authContext';
 import { User, Mail, Lock, Eye, EyeOff, Phone, GraduationCap, ArrowRight } from 'lucide-react';
 
 // ✅ Define component FIRST
