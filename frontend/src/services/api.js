@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api'; // Change to your backend URL
+const API_BASE_URL = 'https://job-mantra.onrender.com'; // Change to your backend URL
 
 // Helper to handle responses
 const handleResponse = async (response) => {
@@ -63,7 +63,7 @@ export const courseAPI = {
 export const testAPI = {
   getAll: () => apiClient('/tests'),
   getById: (id) => apiClient(`/tests/${id}`),
-  submit: (testId, answers) => apiClient(`/tests/${id}/submit`, {
+  submit: (testId, answers) => apiClient(`/tests/${testId}/submit`, {
     method: 'POST',
     body: { answers },
   }),
