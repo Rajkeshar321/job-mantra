@@ -10,12 +10,17 @@ import userRoutes from './routes/users.js';
 import enrollmentRoutes from './routes/enrollments.js';
 import paymentRoutes from './routes/payment.js';
 
-const app = express();        // ← MUST come before app.use()
+const app = express();
 
-// Middlewarea
+// Middleware
 app.use(express.json());
 
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173'];
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -33,7 +38,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/tests', testRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/payments', paymentRoutes);  // ← MOVED here (was before app = express())
+app.use('/api/payments', paymentRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
