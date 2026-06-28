@@ -9,8 +9,8 @@ const handleResponse = async (response) => {
   return response.json();
 };
 
-// Helper to get auth token
-const getToken = () => localStorage.getItem('jobmantra_token');
+// Helper to get auth token (FIXED: use 'token' to match authContext)
+const getToken = () => localStorage.getItem('token');
 
 // API client with auth
 const apiClient = async (endpoint, options = {}) => {
@@ -33,144 +33,113 @@ const apiClient = async (endpoint, options = {}) => {
   return handleResponse(response);
 };
 
-// Auth APIs
+// Auth APIs (FIXED: added /api prefix to all endpoints)
 export const authAPI = {
-  login: (credentials) => apiClient('/auth/login', {
+  login: (credentials) => apiClient('/api/auth/login', {
     method: 'POST',
     body: credentials,
   }),
   
-  register: (userData) => apiClient('/auth/register', {
+  register: (userData) => apiClient('/api/auth/register', {
     method: 'POST',
     body: userData,
   }),
   
-  getMe: () => apiClient('/auth/me'),
+  getMe: () => apiClient('/api/auth/me'),
   
-  logout: () => apiClient('/auth/logout', { method: 'POST' }),
+  logout: () => apiClient('/api/auth/logout', { method: 'POST' }),
 };
 
-// Course APIs
+// Course APIs (FIXED: added /api prefix)
 export const courseAPI = {
-  getAll: () => apiClient('/courses'),
-  getById: (id) => apiClient(`/courses/${id}`),
-  getFree: () => apiClient('/courses/free'),
-  getLive: () => apiClient('/courses/live'),
-  enroll: (courseId) => apiClient(`/courses/${courseId}/enroll`, { method: 'POST' }),
+  getAll: () => apiClient('/api/courses'),
+  getById: (id) => apiClient(`/api/courses/${id}`),
+  getFree: () => apiClient('/api/courses/free'),
+  getLive: () => apiClient('/api/courses/live'),
+  enroll: (courseId) => apiClient(`/api/courses/${courseId}/enroll`, { method: 'POST' }),
 };
 
-// Test APIs
+// Test APIs (FIXED: added /api prefix)
 export const testAPI = {
-  getAll: () => apiClient('/tests'),
-  getById: (id) => apiClient(`/tests/${id}`),
-  submit: (testId, answers) => apiClient(`/tests/${testId}/submit`, {
+  getAll: () => apiClient('/api/tests'),
+  getById: (id) => apiClient(`/api/tests/${id}`),
+  submit: (testId, answers) => apiClient(`/api/tests/${testId}/submit`, {
     method: 'POST',
     body: { answers },
   }),
-  getResults: () => apiClient('/tests/results'),
-  getWeekly: () => apiClient('/tests/weekly'),
+  getResults: () => apiClient('/api/tests/results'),
+  getWeekly: () => apiClient('/api/tests/weekly'),
 };
 
-// Notes/PDF APIs
+// Notes/PDF APIs (FIXED: added /api prefix)
 export const notesAPI = {
-  getAll: () => apiClient('/notes'),
-  getByCategory: (category) => apiClient(`/notes?category=${category}`),
-  download: (id) => apiClient(`/notes/${id}/download`),
+  getAll: () => apiClient('/api/notes'),
+  getByCategory: (category) => apiClient(`/api/notes?category=${category}`),
+  download: (id) => apiClient(`/api/notes/${id}/download`),
 };
 
-// Blog/Job Alert APIs
+// Blog/Job Alert APIs (FIXED: added /api prefix)
 export const blogAPI = {
-  getAll: () => apiClient('/blogs'),
-  getJobAlerts: () => apiClient('/blogs/job-alerts'),
-  getById: (id) => apiClient(`/blogs/${id}`),
+  getAll: () => apiClient('/api/blogs'),
+  getJobAlerts: () => apiClient('/api/blogs/job-alerts'),
+  getById: (id) => apiClient(`/api/blogs/${id}`),
 };
 
-// User APIs
+// User APIs (FIXED: added /api prefix)
 export const userAPI = {
-  getProfile: () => apiClient('/users/profile'),
-  updateProfile: (data) => apiClient('/users/profile', {
+  getProfile: () => apiClient('/api/users/profile'),
+  updateProfile: (data) => apiClient('/api/users/profile', {
     method: 'PUT',
     body: data,
   }),
-  getDashboard: () => apiClient('/users/dashboard'),
-  getEnrolledCourses: () => apiClient('/users/courses'),
-  getTestHistory: () => apiClient('/users/tests'),
+  getDashboard: () => apiClient('/api/users/dashboard'),
+  getEnrolledCourses: () => apiClient('/api/users/courses'),
+  getTestHistory: () => apiClient('/api/users/tests'),
 };
 
-// ═══════════════════════════════════════════════════════════
-// RAZORPAY PAYMENT APIs
-// ═══════════════════════════════════════════════════════════
-
+// RAZORPAY PAYMENT APIs (FIXED: added /api prefix)
 export const paymentAPI = {
-  // Create a new order for payment
-  createOrder: (amount, courseId, courseTitle) => apiClient('/payments/create-order', {
+  createOrder: (amount, courseId, courseTitle) => apiClient('/api/payments/create-order', {
     method: 'POST',
     body: { amount, courseId, courseTitle },
   }),
 
-  // Verify payment after Razorpay checkout
-  verifyPayment: (paymentData) => apiClient('/payments/verify', {
+  verifyPayment: (paymentData) => apiClient('/api/payments/verify', {
     method: 'POST',
     body: paymentData,
   }),
 
-  // Get payment details by order ID
-  getPaymentStatus: (orderId) => apiClient(`/payments/status/${orderId}`),
+  getPaymentStatus: (orderId) => apiClient(`/api/payments/status/${orderId}`),
 
-  // Get all payments for current user
-  getPaymentHistory: () => apiClient('/payments/history'),
+  getPaymentHistory: () => apiClient('/api/payments/history'),
 
-  // Request refund
-  requestRefund: (paymentId, reason) => apiClient('/payments/refund', {
+  requestRefund: (paymentId, reason) => apiClient('/api/payments/refund', {
     method: 'POST',
     body: { paymentId, reason },
   }),
 };
 
-// ═══════════════════════════════════════════════════════════
-// ENROLLMENT APIs (Updated with payment tracking)
-// ═══════════════════════════════════════════════════════════
-
+// ENROLLMENT APIs (FIXED: added /api prefix)
 export const enrollmentAPI = {
-  // Get all enrolled courses with payment details
-  getAll: () => apiClient('/enrollments'),
+  getAll: () => apiClient('/api/enrollments'),
 
-  // Get specific enrollment details
-  getById: (enrollmentId) => apiClient(`/enrollments/${enrollmentId}`),
+  getById: (enrollmentId) => apiClient(`/api/enrollments/${enrollmentId}`),
 
-  // Get enrollment by course ID
-  getByCourseId: (courseId) => apiClient(`/enrollments/course/${courseId}`),
+  getByCourseId: (courseId) => apiClient(`/api/enrollments/course/${courseId}`),
 
-  // Update lecture progress
-  updateProgress: (enrollmentId, lectureId, progress) => apiClient(`/enrollments/${enrollmentId}/progress`, {
+  updateProgress: (enrollmentId, lectureId, progress) => apiClient(`/api/enrollments/${enrollmentId}/progress`, {
     method: 'PUT',
     body: { lectureId, progress },
   }),
 
-  // Mark course as completed
-  completeCourse: (enrollmentId) => apiClient(`/enrollments/${enrollmentId}/complete`, {
+  completeCourse: (enrollmentId) => apiClient(`/api/enrollments/${enrollmentId}/complete`, {
     method: 'PUT',
   }),
 
-  // Check if user is enrolled in a specific course
-  checkEnrollment: (courseId) => apiClient(`/enrollments/check/${courseId}`),
+  checkEnrollment: (courseId) => apiClient(`/api/enrollments/check/${courseId}`),
 };
 
-// ═══════════════════════════════════════════════════════════
-// RAZORPAY CHECKOUT HELPER (Frontend Integration)
-// ═══════════════════════════════════════════════════════════
-
-/**
- * Initialize Razorpay checkout and handle payment flow
- * @param {Object} options - Payment options
- * @param {number} options.amount - Amount in rupees
- * @param {number} options.courseId - Course ID
- * @param {string} options.courseTitle - Course title
- * @param {Object} options.user - User details for prefill
- * @param {Function} options.onSuccess - Callback on successful payment
- * @param {Function} options.onError - Callback on payment failure
- * @returns {Promise} - Resolves with payment result
- */
+// Razorpay checkout helper (no changes needed)
 export const initRazorpayCheckout = async ({
   amount,
   courseId,
@@ -181,14 +150,12 @@ export const initRazorpayCheckout = async ({
 }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // Step 1: Create order on backend
       const orderData = await paymentAPI.createOrder(amount, courseId, courseTitle);
       
       if (!orderData.success) {
         throw new Error(orderData.message || 'Failed to create order');
       }
 
-      // Step 2: Configure Razorpay checkout
       const razorpayOptions = {
         key: orderData.key,
         amount: orderData.amount,
@@ -196,7 +163,7 @@ export const initRazorpayCheckout = async ({
         name: 'JobMantra',
         description: `Enroll in ${courseTitle}`,
         order_id: orderData.orderId,
-        image: '/logo.png', // Add your logo path
+        image: '/logo.png',
         prefill: {
           name: user.name || '',
           email: user.email || '',
@@ -207,7 +174,7 @@ export const initRazorpayCheckout = async ({
           courseTitle,
         },
         theme: {
-          color: '#2563eb', // Your brand color
+          color: '#2563eb',
         },
         modal: {
           ondismiss: () => {
@@ -217,7 +184,6 @@ export const initRazorpayCheckout = async ({
         },
         handler: async (response) => {
           try {
-            // Step 3: Verify payment on backend
             const verifyData = {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -244,7 +210,6 @@ export const initRazorpayCheckout = async ({
         },
       };
 
-      // Step 4: Open Razorpay checkout
       const rzp = new window.Razorpay(razorpayOptions);
 
       rzp.on('payment.failed', (response) => {
@@ -263,10 +228,7 @@ export const initRazorpayCheckout = async ({
   });
 };
 
-// ═══════════════════════════════════════════════════════════
-// UTILITY: Load Razorpay Script (Call before checkout)
-// ═══════════════════════════════════════════════════════════
-
+// Load Razorpay Script (no changes needed)
 export const loadRazorpayScript = () => {
   return new Promise((resolve) => {
     if (window.Razorpay) {
@@ -282,22 +244,15 @@ export const loadRazorpayScript = () => {
   });
 };
 
-// ═══════════════════════════════════════════════════════════
-// ADMIN APIs (For admin dashboard)
-// ═══════════════════════════════════════════════════════════
-
+// ADMIN APIs (FIXED: added /api prefix)
 export const adminAPI = {
-  // Get all payments (admin only)
-  getAllPayments: () => apiClient('/admin/payments'),
+  getAllPayments: () => apiClient('/api/admin/payments'),
 
-  // Get payment statistics
-  getPaymentStats: () => apiClient('/admin/payments/stats'),
+  getPaymentStats: () => apiClient('/api/admin/payments/stats'),
 
-  // Get refund requests
-  getRefundRequests: () => apiClient('/admin/refunds'),
+  getRefundRequests: () => apiClient('/api/admin/refunds'),
 
-  // Process refund
-  processRefund: (paymentId) => apiClient(`/admin/refunds/${paymentId}/process`, {
+  processRefund: (paymentId) => apiClient(`/api/admin/refunds/${paymentId}/process`, {
     method: 'POST',
   }),
 };

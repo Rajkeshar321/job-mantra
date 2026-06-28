@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
 import { User, Mail, Lock, Eye, EyeOff, Phone, GraduationCap, ArrowRight } from 'lucide-react';
 
-// ✅ Define component FIRST
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -14,6 +13,7 @@ const Register = () => {
     targetExam: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // ← ADDED: separate toggle
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -63,7 +63,6 @@ const Register = () => {
     }
   };
 
-  // ✅ Return JSX inside component
   return (
     <div className="auth-page">
       <div className="auth-container" style={{ maxWidth: '500px' }}>
@@ -91,6 +90,7 @@ const Register = () => {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter your full name"
+                  autoComplete="name"              // ← ADDED
                   required
                 />
               </div>
@@ -106,6 +106,7 @@ const Register = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
+                  autoComplete="email"               // ← ADDED
                   required
                 />
               </div>
@@ -121,6 +122,7 @@ const Register = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="Enter your phone number"
+                  autoComplete="tel"                 // ← ADDED
                   required
                 />
               </div>
@@ -160,6 +162,7 @@ const Register = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Create a password"
+                  autoComplete="new-password"        // ← ADDED
                   required
                 />
                 <button
@@ -177,13 +180,21 @@ const Register = () => {
               <div className="input-wrapper">
                 <Lock size={18} className="input-icon" />
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showConfirmPassword ? 'text' : 'password'}  // ← FIXED: separate toggle
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Confirm your password"
+                  autoComplete="new-password"        // ← ADDED
                   required
                 />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}  // ← ADDED
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 
@@ -325,5 +336,4 @@ const Register = () => {
   );
 };
 
-// ✅ Export at the VERY END
 export default Register;
