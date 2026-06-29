@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  Search, User, ChevronDown, Menu, X, BookOpen, 
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/authContext';
+import {
+  Search, User, ChevronDown, Menu, X, BookOpen,
   FileQuestion, Newspaper, Bell, BookText, GraduationCap,
-  MonitorPlay, FileCheck, Home, FileText
+  MonitorPlay, FileCheck, Home, FileText, LogOut
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -12,9 +13,13 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const [isAllDropdownOpen, setIsAllDropdownOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const moreDropdownRef = useRef(null);
   const allDropdownRef = useRef(null);
+  const userDropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
   const handleScroll = useCallback(() => {
@@ -35,6 +40,9 @@ const Navbar = () => {
       if (allDropdownRef.current && !allDropdownRef.current.contains(event.target)) {
         setIsAllDropdownOpen(false);
       }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setIsUserDropdownOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -46,6 +54,7 @@ const Navbar = () => {
     setIsSearchOpen(false);
     setIsMoreDropdownOpen(false);
     setIsAllDropdownOpen(false);
+    setIsUserDropdownOpen(false);
   }, [location.pathname]);
 
   // Handle escape key
@@ -56,11 +65,17 @@ const Navbar = () => {
         setIsMobileMenuOpen(false);
         setIsMoreDropdownOpen(false);
         setIsAllDropdownOpen(false);
+        setIsUserDropdownOpen(false);
       }
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const isActive = (path) => location.pathname === path;
 
@@ -113,7 +128,7 @@ const Navbar = () => {
             ))}
 
             <div className="dropdown" ref={moreDropdownRef}>
-              <button 
+              <button
                 className="nav-link dropdown-toggle"
                 onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
                 aria-expanded={isMoreDropdownOpen}
@@ -124,9 +139,9 @@ const Navbar = () => {
               {isMoreDropdownOpen && (
                 <div className="dropdown-menu mega-menu">
                   {moreLinks.map((link) => (
-                    <Link 
-                      key={link.path} 
-                      to={link.path} 
+                    <Link
+                      key={link.path}
+                      to={link.path}
                       className="dropdown-item"
                       onClick={() => setIsMoreDropdownOpen(false)}
                     >
@@ -140,7 +155,7 @@ const Navbar = () => {
           </div>
 
           <div className="navbar-right">
-            <button 
+            <button
               className="icon-btn search-btn"
               onClick={() => setIsSearchOpen(!isSearchOpen)}
               aria-label="Toggle search"
@@ -149,7 +164,7 @@ const Navbar = () => {
             </button>
 
             <div className="dropdown desktop-only" ref={allDropdownRef}>
-              <button 
+              <button
                 className="icon-btn all-btn"
                 onClick={() => setIsAllDropdownOpen(!isAllDropdownOpen)}
                 aria-expanded={isAllDropdownOpen}
@@ -167,11 +182,47 @@ const Navbar = () => {
               )}
             </div>
 
-            <Link to="/login" className="icon-btn user-btn" aria-label="Login">
-              <User size={20} />
-            </Link>
+            {isAuthenticated ? (
+              <div className="dropdown" ref={userDropdownRef}>
+                <button
+                  className="icon-btn user-btn"
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                  aria-expanded={isUserDropdownOpen}
+                  aria-haspopup="true"
+                  style={{ background: '#10b981' }}
+                >
+                  <User size={20} />
+                </button>
+                {isUserDropdownOpen && (
+                  <div className="dropdown-menu all-menu">
+                    <Link
+                      to="/dashboard"
+                      className="dropdown-item"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        setIsUserDropdownOpen(false);
+                        handleLogout();
+                      }}
+                      style={{ border: 'none', background: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="icon-btn user-btn" aria-label="Login">
+                <User size={20} />
+              </Link>
+            )}
 
-            <button 
+            <button
               className="icon-btn mobile-menu-btn"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
@@ -188,12 +239,12 @@ const Navbar = () => {
             <div className="container">
               <div className="search-input-wrapper">
                 <Search size={20} className="search-icon" />
-                <input 
-                  type="text" 
-                  placeholder="Search for SSC, Banking, Railway, UPSC courses..." 
+                <input
+                  type="text"
+                  placeholder="Search for SSC, Banking, Railway, UPSC courses..."
                   autoFocus
                 />
-                <button 
+                <button
                   onClick={() => setIsSearchOpen(false)}
                   aria-label="Close search"
                 >
@@ -207,12 +258,12 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div 
-          className="mobile-menu-overlay" 
+        <div
+          className="mobile-menu-overlay"
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          <div 
-            className="mobile-menu-content" 
+          <div
+            className="mobile-menu-content"
             ref={mobileMenuRef}
             onClick={(e) => e.stopPropagation()}
           >
@@ -239,6 +290,39 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
+            <div className="mobile-divider" />
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="mobile-nav-link"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <User size={20} />
+                  Dashboard
+                </Link>
+                <button
+                  className="mobile-nav-link"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  style={{ border: 'none', background: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}
+                >
+                  <LogOut size={20} />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="mobile-nav-link"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <User size={20} />
+                Login
+              </Link>
+            )}
           </div>
         </div>
       )}
