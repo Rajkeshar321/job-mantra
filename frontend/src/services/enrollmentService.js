@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/enrollments';
+// ✅ FIXED: Use the deployed backend URL, not localhost
+const API_URL = 'https://job-mantra.onrender.com/api/enrollments';
 
 export const enrollInCourse = async (courseId) => {
   const token = localStorage.getItem('token');

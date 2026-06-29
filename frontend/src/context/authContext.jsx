@@ -9,19 +9,32 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');  // ✅ Changed from 'jobmantra_token'
-    if (storedToken) {
-      setToken(storedToken);
-    }
-    setLoading(false);
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+
+      if (storedToken) {
+        setToken(storedToken);
+        if (storedUser) {
+          try {
+            setUser(JSON.parse(storedUser));
+          } catch (e) {
+            localStorage.removeItem('user');
+          }
+        }
+      }
+      setLoading(false);
+    };
+    initAuth();
   }, []);
 
   const login = async (credentials) => {
     try {
       const response = await authAPI.login(credentials);
       const { token: newToken, user: newUser } = response;
-      
-      localStorage.setItem('token', newToken);  // ✅ Changed from 'jobmantra_token'
+
+      localStorage.setItem('token', newToken);
+      localStorage.setItem('user', JSON.stringify(newUser));
       setToken(newToken);
       setUser(newUser);
       return newUser;
@@ -34,8 +47,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.register(userData);
       const { token: newToken, user: newUser } = response;
-      
-      localStorage.setItem('token', newToken);  // ✅ Changed from 'jobmantra_token'
+
+      localStorage.setItem('token', newToken);
+      localStorage.setItem('user', JSON.stringify(newUser));
       setToken(newToken);
       setUser(newUser);
       return newUser;
@@ -45,20 +59,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');  // ✅ Changed from 'jobmantra_token'
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
+    <AuthContext.Provider value={{
+      user,
       token,
-      login, 
-      logout, 
+      login,
+      logout,
       register,
-      loading, 
-      isAuthenticated: !!user 
+      loading,
+      isAuthenticated: !!token
     }}>
       {children}
     </AuthContext.Provider>
