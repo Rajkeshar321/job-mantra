@@ -142,4 +142,4 @@ const CoursesCard = () => {
   );
 };
 
-export { CoursesCard };
+export default Course;
