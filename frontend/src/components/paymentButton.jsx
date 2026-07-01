@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreditCard, Loader, X, TestTube } from 'lucide-react';
 
+const API_BASE_URL = 'https://job-mantra.onrender.com'; // ✅ FIXED: Use deployed backend
+
 const PaymentButton = ({ course, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -14,14 +16,14 @@ const PaymentButton = ({ course, onSuccess }) => {
 
   // TEST MODE: Bypass Razorpay for development
   const handleTestPayment = async () => {
-    const token = localStorage.getItem('jobmantra_token');
+    const token = localStorage.getItem('token'); // ✅ FIXED: Use 'token' not 'jobmantra_token'
     if (!token) {
       navigate('/login');
       return;
     }
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/payments/test-verify', {
+      const response = await fetch(`${API_BASE_URL}/api/payments/test-verify`, { // ✅ FIXED: Use deployed URL
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -49,7 +51,7 @@ const PaymentButton = ({ course, onSuccess }) => {
   };
 
   const handlePayment = async () => {
-    const token = localStorage.getItem('jobmantra_token');
+    const token = localStorage.getItem('token'); // ✅ FIXED: Use 'token' not 'jobmantra_token'
     
     if (!token) {
       navigate('/login');
@@ -59,7 +61,7 @@ const PaymentButton = ({ course, onSuccess }) => {
     setLoading(true);
 
     try {
-      const orderResponse = await fetch('http://localhost:5000/api/payments/create-order', {
+      const orderResponse = await fetch(`${API_BASE_URL}/api/payments/create-order`, { // ✅ FIXED: Use deployed URL
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -87,7 +89,7 @@ const PaymentButton = ({ course, onSuccess }) => {
         description: course.title,
         order_id: orderData.orderId,
         handler: async function (response) {
-          const verifyResponse = await fetch('http://localhost:5000/api/payments/verify', {
+          const verifyResponse = await fetch(`${API_BASE_URL}/api/payments/verify`, { // ✅ FIXED: Use deployed URL
             method: 'POST',
             credentials: 'include',
             headers: {
