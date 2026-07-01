@@ -1,6 +1,6 @@
 import HeroSection from '../components/HeroSection';
 import BrowseCards from '../components/BrowseCards';
-import CoursesCard from '../components/CoursesCard';
+import {CoursesCard} from '../components/CoursesCard';
 import { Link } from 'react-router-dom';
 import { 
   BookOpen, Users, Award, TrendingUp, Star, 
