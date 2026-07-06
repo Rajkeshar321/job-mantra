@@ -10,12 +10,18 @@ const Course = () => {
   const [enrolling, setEnrolling] = useState(false);
 
   useEffect(() => {
+    // ✅ Guard: don't fetch if id is undefined
+    if (!id) {
+      setLoading(false);
+      return;
+    }
     fetchCourse();
   }, [id]);
 
   const fetchCourse = async () => {
     try {
       const response = await fetch(`https://job-mantra.onrender.com/api/courses/${id}`);
+      if (!response.ok) throw new Error('Course not found');
       const data = await response.json();
       setCourse(data.course || data);
     } catch (error) {
@@ -67,12 +73,25 @@ const Course = () => {
     );
   }
 
-  if (!course) {
+  if (!id || !course) {
     return (
       <div style={{ textAlign: 'center', padding: '4rem' }}>
         <h2>Course not found</h2>
-        <button onClick={() => navigate('/')} style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '0.5rem', cursor: 'pointer' }}>
-          Go Back
+        <p style={{ color: '#64748b', marginTop: '0.5rem' }}>Invalid or missing course ID</p>
+        <button 
+          onClick={() => navigate('/')} 
+          style={{ 
+            marginTop: '1.5rem', 
+            padding: '0.75rem 1.5rem', 
+            background: '#2563eb', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '0.5rem', 
+            cursor: 'pointer',
+            fontWeight: 600
+          }}
+        >
+          Browse Courses
         </button>
       </div>
     );
