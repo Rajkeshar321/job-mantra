@@ -93,4 +93,4 @@ const CoursesCard = () => {
   );
 };
 
-export { CoursesCard };
+export default CoursesCard;

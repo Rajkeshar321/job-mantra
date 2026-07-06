@@ -1,43 +1,37 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Star, Clock, Users, CheckCircle, ArrowRight, Loader } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Star, Clock, Users, CheckCircle, ArrowLeft, Loader, BookOpen } from 'lucide-react';
 
-const CoursesCard = () => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [enrollingId, setEnrollingId] = useState(null);
+const Course = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [enrolling, setEnrolling] = useState(false);
 
   useEffect(() => {
-    fetchCourses();
-  }, []);
+    fetchCourse();
+  }, [id]);
 
-  const fetchCourses = async () => {
+  const fetchCourse = async () => {
     try {
-      const response = await fetch('https://job-mantra.onrender.com/api/courses');
+      const response = await fetch(`https://job-mantra.onrender.com/api/courses/${id}`);
       const data = await response.json();
-      setCourses(data.courses || []);
+      setCourse(data.course || data);
     } catch (error) {
-      console.error('Error fetching courses:', error);
+      console.error('Error fetching course:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const showToast = (message, type) => {
-    alert(message);
-  };
-
-  const handleEnroll = async (course) => {
+  const handleEnroll = async () => {
     const token = localStorage.getItem('token');
-    
     if (!token) {
       navigate('/login');
       return;
     }
-
-    setEnrollingId(course.id);
-
+    setEnrolling(true);
     try {
       const response = await fetch('https://job-mantra.onrender.com/api/enrollments', {
         method: 'POST',
@@ -51,94 +45,131 @@ const CoursesCard = () => {
           price: course.currentPrice
         })
       });
-
       const data = await response.json();
-
       if (response.ok) {
-        showToast(`✅ Enrolled in ${course.title}!`, 'success');
+        alert(`✅ Enrolled in ${course.title}!`);
       } else {
-        showToast(`❌ ${data.message || 'Enrollment failed'}`, 'error');
+        alert(`❌ ${data.message || 'Enrollment failed'}`);
       }
     } catch (error) {
-      showToast('❌ Network error', 'error');
+      alert('❌ Network error');
     } finally {
-      setEnrollingId(null);
+      setEnrolling(false);
     }
   };
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '3rem' }}>
-        <Loader size={32} style={{ margin: '0 auto 1rem', display: 'block' }} />
-        <p>Loading courses...</p>
+      <div style={{ textAlign: 'center', padding: '4rem' }}>
+        <Loader size={40} style={{ marginBottom: '1rem' }} />
+        <p>Loading course...</p>
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div style={{ textAlign: 'center', padding: '4rem' }}>
+        <h2>Course not found</h2>
+        <button onClick={() => navigate('/')} style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '0.5rem', cursor: 'pointer' }}>
+          Go Back
+        </button>
       </div>
     );
   }
 
   return (
-    <section style={{ padding: '4rem 0', background: '#f8fafc' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem' }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: 800, textAlign: 'center', marginBottom: '2rem' }}>
-          Popular Courses
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-          {courses.map((course) => (
-            <div key={course.id} style={{ background: 'white', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-              <img 
-                src={course.image || 'https://via.placeholder.com/400x180?text=Course'} 
-                alt={course.title} 
-                style={{ width: '100%', height: '180px', objectFit: 'cover' }} 
-              />
-              <div style={{ padding: '1.25rem' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-                  {course.title}
-                </h3>
-                <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>
-                  <span><Star size={14} fill="#f59e0b" color="#f59e0b" /> {course.rating || '4.5'}</span>
-                  <span><Users size={14} /> {course.students || 0}</span>
-                  <span><Clock size={14} /> {course.duration || 'N/A'}</span>
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-                  {(course.features || []).map((feature, idx) => (
-                    <span key={idx} style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', background: '#d1fae5', color: '#065f46', borderRadius: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <CheckCircle size={12} /> {feature}
-                    </span>
-                  ))}
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-                  <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2563eb' }}>
-                    ₹{course.currentPrice || 0}
-                  </span>
-                  <button 
-                    onClick={() => handleEnroll(course)}
-                    disabled={enrollingId === course.id}
-                    style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '0.5rem', 
-                      background: '#2563eb', 
-                      color: 'white', 
-                      border: 'none', 
-                      padding: '0.5rem 1rem', 
-                      borderRadius: '0.5rem', 
-                      fontWeight: 600,
-                      cursor: enrollingId === course.id ? 'not-allowed' : 'pointer',
-                      opacity: enrollingId === course.id ? '0.7' : '1'
-                    }}
-                  >
-                    {enrollingId === course.id ? (
-                      <><Loader size={16} /> Enrolling...</>
-                    ) : (
-                      <>Enroll Now <ArrowRight size={16} /></>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+    <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
+      {/* Header */}
+      <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '1rem 0' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <button 
+            onClick={() => navigate(-1)} 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', color: '#2563eb', cursor: 'pointer', fontSize: '0.95rem' }}
+          >
+            <ArrowLeft size={18} /> Back
+          </button>
         </div>
       </div>
-    </section>
+
+      {/* Course Content */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
+          {/* Left Column */}
+          <div>
+            <img 
+              src={course.image || 'https://via.placeholder.com/800x400'} 
+              alt={course.title} 
+              style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '1rem', marginBottom: '1.5rem' }} 
+            />
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem' }}>{course.title}</h1>
+            <div style={{ display: 'flex', gap: '1.5rem', color: '#64748b', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <Star size={16} fill="#f59e0b" color="#f59e0b" /> {course.rating || '4.5'}
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <Users size={16} /> {course.students || 0} students
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <Clock size={16} /> {course.duration || 'N/A'}
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <BookOpen size={16} /> {course.modules?.length || 0} modules
+              </span>
+            </div>
+            <p style={{ color: '#475569', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+              {course.description || 'No description available.'}
+            </p>
+
+            {/* Features */}
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' }}>What you'll learn</h3>
+            <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '2rem' }}>
+              {(course.features || ['Industry-relevant curriculum', 'Hands-on projects', 'Certificate of completion', 'Lifetime access']).map((feature, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#475569' }}>
+                  <CheckCircle size={18} color="#10b981" />
+                  {feature}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column - Enrollment Card */}
+          <div style={{ position: 'sticky', top: '2rem', height: 'fit-content' }}>
+            <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#2563eb', marginBottom: '0.5rem' }}>
+                ₹{course.currentPrice || 0}
+              </div>
+              {course.originalPrice && (
+                <div style={{ textDecoration: 'line-through', color: '#94a3b8', marginBottom: '1.5rem' }}>
+                  ₹{course.originalPrice}
+                </div>
+              )}
+              <button 
+                onClick={handleEnroll}
+                disabled={enrolling}
+                style={{ 
+                  width: '100%', 
+                  padding: '0.875rem', 
+                  background: '#2563eb', 
+                  color: 'white', 
+                  border: 'none', 
+                  borderRadius: '0.5rem', 
+                  fontSize: '1rem', 
+                  fontWeight: 600,
+                  cursor: enrolling ? 'not-allowed' : 'pointer',
+                  opacity: enrolling ? 0.7 : 1
+                }}
+              >
+                {enrolling ? 'Enrolling...' : 'Enroll Now'}
+              </button>
+              <div style={{ marginTop: '1rem', fontSize: '0.85rem', color: '#64748b', textAlign: 'center' }}>
+                30-day money-back guarantee
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
