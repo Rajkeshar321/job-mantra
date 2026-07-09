@@ -19,6 +19,7 @@ app.use(express.json());
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
+  'https://jobmantra-web.vercel.app',
   'https://jobmantraweb.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
