@@ -19,7 +19,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/courses" element={<Course />} />
+          <Route path="/courses/:id" element={<Course />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
