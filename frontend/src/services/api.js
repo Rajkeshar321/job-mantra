@@ -127,6 +127,8 @@ export const enrollmentAPI = {
 
   getByCourseId: (courseId) => apiClient(`/api/enrollments/course/${courseId}`),
 
+  getPaid: () => apiClient('/api/courses?type=paid'),
+
   updateProgress: (enrollmentId, lectureId, progress) => apiClient(`/api/enrollments/${enrollmentId}/progress`, {
     method: 'PUT',
     body: { lectureId, progress },

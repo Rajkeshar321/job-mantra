@@ -22,13 +22,6 @@ router.get('/', async (req, res) => {
   res.json(courses);
 });
 
-// Get single course
-router.get('/:id', async (req, res) => {
-  const course = await Course.findById(req.params.id);
-  if (!course) return res.status(404).json({ message: 'Course not found' });
-  res.json(course);
-});
-
 // Get free courses
 router.get('/free', async (req, res) => {
   const courses = await Course.find({ type: 'free', isActive: true });
@@ -39,6 +32,13 @@ router.get('/free', async (req, res) => {
 router.get('/live', async (req, res) => {
   const courses = await Course.find({ type: 'live', isActive: true });
   res.json(courses);
+});
+
+// Get single course
+router.get('/:id', async (req, res) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) return res.status(404).json({ message: 'Course not found' });
+  res.json(course);
 });
 
 // Enroll in course
