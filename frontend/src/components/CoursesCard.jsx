@@ -16,7 +16,7 @@ const CoursesCard = () => {
     try {
       const response = await fetch('https://job-mantra.onrender.com/api/courses');
       const data = await response.json();
-      setCourses(data.courses || []);
+      setCourses(Array.isArray(data) ? data : (data.courses || []));
     } catch (error) {
       console.error('Error fetching courses:', error);
     } finally {

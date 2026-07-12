@@ -11,6 +11,7 @@ import Register from './pages/Register';
 import Tests from './pages/Tests';
 import Blog from './pages/Blog';
 import './index.css';
+import CoursesCard from './components/CoursesCard';
 
 function App() {
   return (
