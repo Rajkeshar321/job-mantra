@@ -20,7 +20,10 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/courses/:id" element={<Course />} />
+
+          <Route path="/courses" element={<CoursesCard />} />
+
+          <Route path="/courses/:id" element={<Courses />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
