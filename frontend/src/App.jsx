@@ -21,9 +21,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
 
+          {/* List of courses route */}
           <Route path="/courses" element={<CoursesCard />} />
 
-          <Route path="/courses/:id" element={<Courses />} />
+          {/* Fixed line below: Changed <Courses /> to <Course /> */}
+          <Route path="/courses/:id" element={<Course />} />
+
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
